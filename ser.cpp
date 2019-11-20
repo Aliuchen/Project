@@ -123,7 +123,7 @@ class Event
     {
       base=event_base_new();  //  创建event_base 实例   （Reactor实例）
       assert(base!=nullptr);
-      sock_ev=event_new(base,sockfd,EV_READ | EV_PERSIST ,di.Accept_cb,(void *)base);  // 创建通用的事件处理器 ，对套接字的处理
+      sock_ev=event_new(base,sockfd,EV_READ | EV_PERSIST ,Dispse::Accept_cb,(void *)base);  // 创建通用的事件处理器 ，对套接字的处理
     }
     ~Event()  //    释放系统资源
     {
@@ -140,7 +140,6 @@ class Event
     }
   private:
     Socket sock;
-    Dispse di;
     int sockfd;
     struct event_base* base;
     struct event* sock_ev;
