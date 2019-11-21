@@ -1,15 +1,12 @@
-#include<iostream>
-#include<string>
-#include<vector>
-using namespace std;
+/*===============================================================
+*   Copyright (C) 2019 All rights reserved.
+*   
+*   文件名称：separation.cpp
+*   创 建 者：@liuchen
+*   创建日期：2019年11月21日
+*   描    述：
+*
+*   更新日志：
+*
+================================================================*/
 
-
-void Asyn_head_text(string s,string &head, string &text)
-{
-	int pos1 = 0;
-	int pos2 = 0;
-	pos2 = s.find("\r\n\r\n", pos1);
-	head = s.substr(pos1, pos2-pos1+1);
-	pos1 = pos2+2;
-	text = s.substr(pos1, s.size()-pos1);
-}
