@@ -1,23 +1,16 @@
-#pragma once
-#include <iostream>
-#include <string>
-#include <vector>
-#include <cstdlib>
-#include <mysql/mysql.h>
-
-using std::cout;
-using std::endl;
-
+#pragma once 
+//#include <mysql/mysql.h>
+#include<iostream>
 #define TB_NAME "login"
 #define MAX_SQL_LEN 1024
-
-
+using std::cout;
+using std::endl;
 class MysqlOperator {
   public:
     MysqlOperator() {
       mysql_init(&_mysql); // 初始化数据库句柄
-      MYSQL* ret = mysql_real_connect(&_mysql, "127.0.0.1", "root", 
-          "034917","project", 0, nullptr, 0);
+      MYSQL* ret = mysql_real_connect(&_mysql, "47.94.140.62", "root", 
+          "LC199938","project", 0, nullptr, 0);
       if (ret == nullptr) {
         cout << "mysql connect error:" << mysql_errno(&_mysql) << endl;
         exit(-1);

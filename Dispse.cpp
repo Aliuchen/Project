@@ -11,6 +11,19 @@
 ================================================================*/
 #include"ser.h"
 std::vector<struct event*>map_arr(MAX,nullptr);
+bool getLoginInfo(std::unordered_map<std::string, std::string>& info) {
+  MysqlOperator mySQL;
+  std::string passwd;
+  bool sign=mySQL.Query(passwd,info["name"]);
+  if (!sign) {
+    mySQL.Insert(info["name"], info["passWd"], info["phoneNum"]);
+    cout << "注册成功.." << endl;
+    return true;
+  }
+  cout << "注册失败" << endl;
+  return false;
+}
+
 class Dispse  
 {
   public:
@@ -49,6 +62,9 @@ class Dispse
     std::string head;
     std::string text;
     Asyn_head_text(buff,head,text);
+    std::unordered_map<std::string,std::string>map;
+    LandAnalyze(text,map);
+    getLoginInfo(map);
   }
 }
 //   将处理事件添加到表中
