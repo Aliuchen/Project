@@ -1,11 +1,11 @@
 #include"ser.h"
-void LandAnalyze(string &src, unordered_map<string, string> &mMap){
+void LandAnalyze(std::string &src, std::unordered_map<std::string, std::string> &mMap){
   //以\r\n分割
   
   int pos1=0;
   int pos2=0;
-	const string temp = "\r\n";
-  vector<string>vec;
+	const std::string temp = "\r\n";
+  std::vector<std::string>vec;
   for(;;){
     pos2=src.find(temp,pos1);
     if (pos2 == -1)
@@ -17,10 +17,10 @@ void LandAnalyze(string &src, unordered_map<string, string> &mMap){
   }
 
   //以：分割
-  vector<string> vec2;
+  std::vector<std::string> vec2;
   int num1=0;
   int num2=0;
-  const string temp2=":";
+  const std::string temp2=":";
   int len=vec.size();   
   for(int j=0;j<len;j++){
     num2 = 0;
