@@ -26,8 +26,10 @@
 #include<list>
 #include<iostream>
 #include<vector>
+#include<unordered_map>
 #define MAX FD_SETSIZE
 void Asyn_head_text(std::string s,std::string &head, std::string &text);
+void LandAnalyze(std::string &src, std::unordered_map<std::string, std::string> &mMap);
 class Dispse;
 class Socket;
 class Event;
