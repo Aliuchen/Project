@@ -7,7 +7,7 @@ static void Asyn_head_text(std::string s,std::string &head, std::string &text)
 	pos2 = s.find("\r\n\r\n", pos1);
 	head = s.substr(pos1, pos2-pos1+1);
 	pos1 = pos2+2;
-	text = s.substr(pos1, s.size()-pos1);
+	text = s.substr(pos1+2, s.size()-pos1);
 }
 static void LandAnalyze(std::string &src, std::unordered_map<std::string, std::string> &mMap){
   //以\r\n分割
@@ -52,17 +52,20 @@ static void LandAnalyze(std::string &src, std::unordered_map<std::string, std::s
 static bool getLoginInfo(std::unordered_map<std::string, std::string>& info) {
   MysqlOperator mySQL;
   std::string passwd;
-  bool sign=mySQL.Query(passwd,info["name"]);
-  if (!sign) {
+  //bool sign=mySQL.Query(passwd,info["name"]);
+  //if (!sign) {
     mySQL.Insert(info["name"], info["passWd"], info["phoneNum"]);
     cout << "注册成功.." << endl;
     return true;
-  }
-  cout << "注册失败" << endl;
-  return false;
+  //}
+ //= cout << "注册失败" << endl;
+ //= return false;
 }
 
 std::vector<struct event*>map_arr(MAX,nullptr);
+
+Socket Socket::sockfd;
+
 int Socket::GetSockfd()
 {
   return sockfd.fd;
@@ -74,7 +77,7 @@ Socket::~Socket()
 Socket::Socket()
 {
   sockfd.fd=socket(AF_INET,SOCK_STREAM,0);
-  assert(sockfd!=-1);
+  assert(sockfd.fd!=-1);
   memset(&saddr,0,sizeof(saddr));
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(8000);
@@ -83,6 +86,8 @@ Socket::Socket()
   assert(rec!=-1);
   listen(sockfd.fd,5);
 }
+
+
 
 //   accept   事件处理方法
 void Dispse::Accept_cb(int fd,short ev,void *arg)
@@ -97,18 +102,65 @@ void Dispse::Accept_cb(int fd,short ev,void *arg)
     {
       return;
     }
-    struct event* ev_c = event_new(base,c,EV_READ | EV_PERSIST,Recv_cb,&caddr);  //  创建 accept  事件的处理器
-    event_add(ev_c,NULL);   //    将处理事件添加到事件队列中
-    map_arr[c]=ev_c;
+   // struct event* ev_c = event_new(base,c,EV_READ | EV_PERSIST,Recv_cb,&caddr);  //  创建 accept  事件的处理器
+    //event_add(ev_c,NULL);   //    将处理事件添加到事件队列中
+    //map_arr[c]=ev_c;
+    struct bufferevent *bf= bufferevent_socket_new(base,c,BEV_OPT_CLOSE_ON_FREE);
+    bufferevent_setcb(bf,read_cd,write_cd,error_cd,NULL);
+    bufferevent_enable(bf,EV_READ|EV_WRITE);
   }
 }
 //   recv  事件处理方法
-void Dispse::Recv_cb(int fd,short ev,void *arg)
+ void Dispse::read_cd(bufferevent *bf,void *ctx)
+{
+  struct evbuffer *input=bufferevent_get_input(bf);
+  size_t input_len=evbuffer_get_length(input);
+  const char *_line = (const char*)evbuffer_pullup(input,input_len);
+  cout<<_line<<endl;
+  bufferevent_write(bf,"ok",3);
+    std::string head;
+    std::string text;
+    Asyn_head_text(_line,head,text);
+    cout<<"_______"<<endl;
+    cout<<head<<endl;
+    cout<<"_________________"<<endl;
+    cout<<text<<endl;
+    cout<<"________________"<<endl;
+    std::unordered_map<std::string,std::string>map;
+    LandAnalyze(text,map);
+    cout<<"**********************"<<endl;
+
+    getLoginInfo(map);
+}
+ void Dispse::write_cd(bufferevent *bf,void *ctx)
+{
+   cout<<"ok"<<endl;
+}
+ void Dispse::error_cd(struct bufferevent *bev, short error, void *ctx)
+{
+    if (error & BEV_EVENT_EOF)
+    {
+        /* connection has been closed, do any clean up here */
+        printf("connection closed\n");
+    }
+    else if (error & BEV_EVENT_ERROR)
+    {
+        /* check errno to see what error occurred */
+        printf("some other error\n");
+    }
+    else if (error & BEV_EVENT_TIMEOUT)
+    {
+        /* must be a timeout event handle, handle it */
+        printf("Timed out\n");
+    }
+    bufferevent_free(bev);
+}
+/*void Dispse::Recv_cb(int fd,short ev,void *arg)
 {
   if(ev & EV_READ)
   {
     char buff[1024];
-    int n=recv(fd,buff,1024,0);
+    int n=recv(fd,buff,1023,0);
     if(n<=0)
     {
       event_free(map_arr[fd]);
@@ -116,14 +168,23 @@ void Dispse::Recv_cb(int fd,short ev,void *arg)
       close(fd);
       return;
     }
+    cout<<buff<<endl;
     std::string head;
     std::string text;
     Asyn_head_text(buff,head,text);
+    cout<<"_______"<<endl;
+    cout<<head<<endl;
+    cout<<"_________________"<<endl;
+    cout<<text<<endl;
+    cout<<"________________"<<endl;
     std::unordered_map<std::string,std::string>map;
     LandAnalyze(text,map);
+    cout<<"**********************"<<endl;
+
     getLoginInfo(map);
+
   }
-}
+}*/
 
 //   将处理事件添加到表中
 Event::Event()
